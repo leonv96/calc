@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>VAT Q Calc</title>
     
+    <!-- Apple Web App Tags for Offline/Native App Behavior -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="VAT Q Calc">
@@ -19,12 +20,12 @@
         input:focus { outline: none; border-color: #007aff; background: white; }
         .line { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px; }
         .total { font-weight: bold; font-size: 19px; border-top: 1px solid #e5e5ea; padding-top: 12px; margin-top: 12px; }
-        .vat-box { background: #fff9e6; border: 1px dashed #ffcc00; border-radius: 8px; padding: 10px; margin-top: 15px; font-size: 14px; }
+        .vat-box { background: #fff9e6; border: 1px dashed #ffcc00; border-radius: 8px; padding: 12px; margin-top: 15px; margin-bottom: 15px; font-size: 14px; }
         .green { color: #34c759; font-weight: bold; }
         .red { color: #ff3b30; font-weight: bold; }
         .blue { color: #007aff; font-weight: bold; }
         .grey { color: #8e8e93; font-weight: 500; font-size: 14px; }
-        .orange { color: #e68a00; font-weight: bold; }
+        .orange { color: #e68a00; font-weight: bold; font-size: 17px; }
     </style>
 </head>
 <body>
@@ -56,12 +57,13 @@
             <span id="resBuyVat" class="grey">£0.00</span>
         </div>
         
+        <!-- New Dedicated VAT Breakdown Box -->
         <div class="vat-box">
-            <div class="line" style="margin-bottom: 5px;">
+            <div class="line" style="margin-bottom: 6px;">
                 <span>VAT Owed on Sale:</span>
                 <span id="resSaleVat" style="color:#555;">£0.00</span>
             </div>
-            <div class="line" style="margin-bottom: 0; font-weight: bold;">
+            <div class="line" style="margin-bottom: 0; font-weight: bold; border-top: 1px dotted #ffcc00; padding-top: 6px;">
                 <span>Set Aside for HMRC:</span>
                 <span id="resNetVatBill" class="orange">£0.00</span>
             </div>
@@ -79,14 +81,19 @@ function runCalc() {
     var auctionGross = parseFloat(document.getElementById('auctionPriceGross').value) || 0;
     var atGross = parseFloat(document.getElementById('atPriceGross').value) || 0;
     
+    // Calculate net values (stripping out 20% VAT)
     var sellNet = atGross / 1.2;
     var buyNet = auctionGross / 1.2;
     
+    // Calculate individual VAT elements
     var buyVat = auctionGross - buyNet;
     var saleVat = atGross - sellNet;
+    
+    // Net liability (VAT collected minus VAT paid out)
     var netVatBill = saleVat - buyVat;
     var netProfit = sellNet - buyNet;
     
+    // Update display numbers
     document.getElementById('resSellNet').innerText = '£' + sellNet.toFixed(2);
     document.getElementById('resBuyNet').innerText = '£' + buyNet.toFixed(2);
     document.getElementById('resBuyVat').innerText = '£' + buyVat.toFixed(2);
@@ -96,6 +103,7 @@ function runCalc() {
     var profEl = document.getElementById('resProfit');
     profEl.innerText = '£' + netProfit.toFixed(2);
     
+    // Color code the profit total
     if (netProfit > 0) {
         profEl.className = 'green';
     } else if (netProfit < 0) {
@@ -105,9 +113,10 @@ function runCalc() {
     }
 }
 
+// --- Offline Storage Logic ---
 if ('serviceWorker' in navigator) {
     const script = 'data:text/javascript;base64,' + btoa(`
-        const cacheName = 'vat-q-v2';
+        const cacheName = 'vat-q-v3';
         self.addEventListener('install', e => {
             e.waitUntil(caches.open(cacheName).then(cache => cache.addAll(['./'])));
         });
