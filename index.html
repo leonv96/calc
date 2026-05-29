@@ -18,7 +18,8 @@
         input { width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 8px; font-size: 18px; box-sizing: border-box; background: #f2f2f7; font-weight: bold; }
         input:focus { outline: none; border-color: #007aff; background: white; }
         .line { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px; }
-        .total { font-weight: bold; font-size: 19px; border-top: 1px solid #e5e5ea; padding-top: 12px; margin-top: 12px; }
+        .total { font-weight: bold; font-size: 19px; border-top: 1px solid #e5e5ea; padding-top: 12px; margin-top: 12px; margin-bottom: 5px; }
+        .margin-pct { font-size: 14px; text-align: right; margin-bottom: 12px; }
         .vat-box { background: #fff9e6; border: 1px dashed #ffcc00; border-radius: 8px; padding: 12px; margin-top: 15px; margin-bottom: 15px; font-size: 14px; }
         .green { color: #34c759; font-weight: bold; }
         .red { color: #ff3b30; font-weight: bold; }
@@ -71,6 +72,9 @@
             <span>True Net Profit Margin:</span>
             <span id="resProfit">£0.00</span>
         </div>
+        <div class="margin-pct grey">
+            Margin Percentage: <span id="resProfitPct" style="font-weight: bold;">0.00%</span>
+        </div>
     </div>
 </div>
 
@@ -87,6 +91,7 @@ function runCalc() {
     
     var netVatBill = saleVat - buyVat;
     var netProfit = sellNet - buyNet;
+    var profitPct = sellNet > 0 ? (netProfit / sellNet) * 100 : 0;
     
     document.getElementById('resSellNet').innerText = '£' + sellNet.toFixed(2);
     document.getElementById('resBuyNet').innerText = '£' + buyNet.toFixed(2);
@@ -95,18 +100,23 @@ function runCalc() {
     document.getElementById('resNetVatBill').innerText = '£' + netVatBill.toFixed(2);
     
     var profEl = document.getElementById('resProfit');
+    var pctEl = document.getElementById('resProfitPct');
+    
     profEl.innerText = '£' + netProfit.toFixed(2);
+    pctEl.innerText = profitPct.toFixed(2) + '%';
     
     if (netProfit > 0) {
         profEl.className = 'green';
+        pctEl.className = 'green';
     } else if (netProfit < 0) {
         profEl.className = 'red';
+        pctEl.className = 'red';
     } else {
         profEl.className = '';
+        pctEl.className = '';
     }
 }
 
-// Clean Apple-approved offline registration
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js');
 }
