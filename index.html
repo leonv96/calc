@@ -53,4 +53,74 @@
             <span id="resBuyNet" class="grey">£0.00</span>
         </div>
         <div class="line">
-            <span>VAT
+            <span>VAT Reclaimable on Buy:</span>
+            <span id="resBuyVat" class="grey">£0.00</span>
+        </div>
+        
+        <div class="vat-box">
+            <div class="line" style="margin-bottom: 6px;">
+                <span>VAT Owed on Sale:</span>
+                <span id="resSaleVat" style="color:#555;">£0.00</span>
+            </div>
+            <div class="line" style="margin-bottom: 0; font-weight: bold; border-top: 1px dotted #ffcc00; padding-top: 6px;">
+                <span>Set Aside for HMRC:</span>
+                <span id="resNetVatBill" class="orange">£0.00</span>
+            </div>
+        </div>
+
+        <div class="line total">
+            <span>True Net Profit Margin:</span>
+            <span id="resProfit">£0.00</span>
+        </div>
+        <div class="margin-pct grey">
+            Margin Percentage: <span id="resProfitPct" style="font-weight: bold;">0.00%</span>
+        </div>
+    </div>
+</div>
+
+<script>
+function runCalc() {
+    var auctionGross = parseFloat(document.getElementById('auctionPriceGross').value) || 0;
+    var atGross = parseFloat(document.getElementById('atPriceGross').value) || 0;
+    
+    var sellNet = atGross / 1.2;
+    var buyNet = auctionGross / 1.2;
+    
+    var buyVat = auctionGross - buyNet;
+    var saleVat = atGross - sellNet;
+    
+    var netVatBill = saleVat - buyVat;
+    var netProfit = sellNet - buyNet;
+    var profitPct = sellNet > 0 ? (netProfit / sellNet) * 100 : 0;
+    
+    document.getElementById('resSellNet').innerText = '£' + sellNet.toFixed(2);
+    document.getElementById('resBuyNet').innerText = '£' + buyNet.toFixed(2);
+    document.getElementById('resBuyVat').innerText = '£' + buyVat.toFixed(2);
+    document.getElementById('resSaleVat').innerText = '£' + saleVat.toFixed(2);
+    document.getElementById('resNetVatBill').innerText = '£' + netVatBill.toFixed(2);
+    
+    var profEl = document.getElementById('resProfit');
+    var pctEl = document.getElementById('resProfitPct');
+    
+    profEl.innerText = '£' + netProfit.toFixed(2);
+    pctEl.innerText = profitPct.toFixed(2) + '%';
+    
+    if (netProfit > 0) {
+        profEl.className = 'green';
+        pctEl.className = 'green';
+    } else if (netProfit < 0) {
+        profEl.className = 'red';
+        pctEl.className = 'red';
+    } else {
+        profEl.className = '';
+        pctEl.className = '';
+    }
+}
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js');
+}
+</script>
+
+</body>
+</html>
