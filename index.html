@@ -19,10 +19,12 @@
         input:focus { outline: none; border-color: #007aff; background: white; }
         .line { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px; }
         .total { font-weight: bold; font-size: 19px; border-top: 1px solid #e5e5ea; padding-top: 12px; margin-top: 12px; }
+        .vat-box { background: #fff9e6; border: 1px dashed #ffcc00; border-radius: 8px; padding: 10px; margin-top: 15px; font-size: 14px; }
         .green { color: #34c759; font-weight: bold; }
         .red { color: #ff3b30; font-weight: bold; }
         .blue { color: #007aff; font-weight: bold; }
         .grey { color: #8e8e93; font-weight: 500; font-size: 14px; }
+        .orange { color: #e68a00; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -53,6 +55,18 @@
             <span>VAT Reclaimable on Buy:</span>
             <span id="resBuyVat" class="grey">£0.00</span>
         </div>
+        
+        <div class="vat-box">
+            <div class="line" style="margin-bottom: 5px;">
+                <span>VAT Owed on Sale:</span>
+                <span id="resSaleVat" style="color:#555;">£0.00</span>
+            </div>
+            <div class="line" style="margin-bottom: 0; font-weight: bold;">
+                <span>Set Aside for HMRC:</span>
+                <span id="resNetVatBill" class="orange">£0.00</span>
+            </div>
+        </div>
+
         <div class="line total">
             <span>True Net Profit Margin:</span>
             <span id="resProfit">£0.00</span>
@@ -69,11 +83,15 @@ function runCalc() {
     var buyNet = auctionGross / 1.2;
     
     var buyVat = auctionGross - buyNet;
+    var saleVat = atGross - sellNet;
+    var netVatBill = saleVat - buyVat;
     var netProfit = sellNet - buyNet;
     
     document.getElementById('resSellNet').innerText = '£' + sellNet.toFixed(2);
     document.getElementById('resBuyNet').innerText = '£' + buyNet.toFixed(2);
     document.getElementById('resBuyVat').innerText = '£' + buyVat.toFixed(2);
+    document.getElementById('resSaleVat').innerText = '£' + saleVat.toFixed(2);
+    document.getElementById('resNetVatBill').innerText = '£' + netVatBill.toFixed(2);
     
     var profEl = document.getElementById('resProfit');
     profEl.innerText = '£' + netProfit.toFixed(2);
@@ -89,7 +107,7 @@ function runCalc() {
 
 if ('serviceWorker' in navigator) {
     const script = 'data:text/javascript;base64,' + btoa(`
-        const cacheName = 'vat-q-v1';
+        const cacheName = 'vat-q-v2';
         self.addEventListener('install', e => {
             e.waitUntil(caches.open(cacheName).then(cache => cache.addAll(['./'])));
         });
